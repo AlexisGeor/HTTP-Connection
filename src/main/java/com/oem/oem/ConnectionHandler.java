@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import static com.oem.oem.Converter.communicarionBoard;
 
 public class ConnectionHandler implements Runnable {
         private Socket clientSocket;
@@ -28,55 +29,15 @@ public class ConnectionHandler implements Runnable {
                 // Obtener el flujo de salida del socket
                 PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true);
 
-
                 // Leer el mensaje del cliente
                 String mensaje = reader.readLine();
-
 
                 // Mostrar el mensaje recibido
                 System.out.println("Mensaje recibido: " + mensaje);
 
-                // Enviar una respuesta al cliente
-
-				/*String respuesta = "Java resp";
-				writer.println(respuesta);*/
-
-				/*
-				char[] caracteres = {'1','3','0','3','1','4','B','3','5','1','4','4',3};  // 3 0 3 1 4 B 3 5 3 1 4 4
-
-				// Convertir los caracteres a un arreglo de bytes
-				byte[] respuestaBytes = new byte[caracteres.length];
-				for (int i = 0; i < caracteres.length; i++) {
-					respuestaBytes[i] = (byte) caracteres[i];
-				}
-
-				// Enviar la respuesta byte a byte
-				for (byte b : respuestaBytes) {
-					outputStream.write(b);
-				}
-				 */
                 String valor = "01K51D";
-
-                // Construir la secuencia completa
-                char startChar = 2;
-                String middleString = AsciiToHexConverter.asciiToHex(valor); // '01K51D' "30314B353144"  "30314F393135"'010915' Conversion de String a cadena Ascci
-                char endChar = 3;
-
-                // Convertir la secuencia completa en un arreglo de bytes
-                byte[] sequenceBytes = new byte[middleString.length() / 2 + 2];
-                sequenceBytes[0] = (byte) startChar;
-
-                for (int i = 0; i < middleString.length(); i += 2) {
-                    String byteString = middleString.substring(i, i + 2);
-                    byte sequenceByte = (byte) Integer.parseInt(byteString, 16);
-                    sequenceBytes[i / 2 + 1] = sequenceByte;
-                }
-
-                sequenceBytes[sequenceBytes.length - 1] = (byte) endChar;
-
                 // Enviar la secuencia completa
-                outputStream.write(sequenceBytes);
-
+                outputStream.write(communicarionBoard(valor));
 
                 // Cerrar la conexión
                 clientSocket.close();
@@ -84,6 +45,21 @@ public class ConnectionHandler implements Runnable {
                 e.printStackTrace();
             }
         }
-    }
+}
 
 
+
+
+
+/* La clase ConnectionHandler es responsable de manejar una conexión entrante en un hilo separado. Aquí tienes una explicación breve de la clase ConnectionHandler:
+
+Implementación de Runnable: ConnectionHandler implementa la interfaz Runnable, lo que significa que puede ser ejecutada en un hilo separado. Al implementar Runnable, se debe proporcionar una implementación para el método run(), que define la lógica a ejecutar en el hilo separado.
+
+Método run(): El método run() es donde se define la lógica para manejar la conexión entrante. En este método, se realizan las operaciones necesarias para leer la solicitud del cliente, procesarla y enviar una respuesta. En tu caso, esto incluye la lectura de una cadena en formato hexadecimal y la conversión a una cadena ASCII.
+
+Manejo de la conexión: Dentro del método run(), se utiliza el objeto Socket proporcionado en el constructor para obtener los flujos de entrada y salida de la conexión. Esto permite leer la solicitud del cliente y enviar una respuesta.
+
+Cierre de la conexión: Una vez que se ha procesado la solicitud y se ha enviado la respuesta, se deben cerrar los flujos y el socket para liberar los recursos y finalizar la conexión.
+
+En resumen, la clase ConnectionHandler encapsula la lógica para manejar una conexión entrante en un hilo separado. Al implementar la interfaz Runnable y proporcionar una implementación para el método run(), se define cómo se procesa la conexión y se responde al cliente.
+ */
